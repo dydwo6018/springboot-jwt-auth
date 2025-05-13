@@ -9,13 +9,14 @@ import com.springbootjwtauth.exception.ErrorCode;
 import com.springbootjwtauth.model.Role;
 import com.springbootjwtauth.model.User;
 import com.springbootjwtauth.util.JwtUtil;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-
+@Getter
 @Service
 @RequiredArgsConstructor
 public class AuthService {
