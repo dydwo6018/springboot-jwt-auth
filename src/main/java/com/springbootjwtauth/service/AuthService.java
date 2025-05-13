@@ -74,4 +74,19 @@ public class AuthService {
         // 4. 응답 객체에 담아서 반환
         return new TokenResponseDto(accessToken);
     }
+
+    public UserResponseDto grantAdminRole(UUID userId) {
+        // 1. userId로 사용자 조회
+        User user = userStore.values().stream()
+                .filter(u -> u.getId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 2. ADMIN 권한 추가 (중복 허용 안함)
+        user.getRoles().add(Role.ADMIN);
+
+        // 3. 응답 DTO로 변환
+        return new UserResponseDto(user.getUsername(), user.getNickname(), user.getRoles());
+    }
+
 }

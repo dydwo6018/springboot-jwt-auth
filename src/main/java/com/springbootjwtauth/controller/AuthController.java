@@ -8,10 +8,10 @@ import com.springbootjwtauth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +32,14 @@ public class AuthController {
     public ResponseEntity<TokenResponseDto> login(@RequestBody @Valid LoginRequestDto request) {
         TokenResponseDto responseDto = authService.login(request);
         return ResponseEntity.ok(responseDto);
+    }
+
+    // 관리자 권한 부여
+    @PatchMapping("/admin/users/{userId}/roles")
+    @PreAuthorize("hasRole('ADMIN')") // 관리자만 호출 가능
+    public ResponseEntity<UserResponseDto> grantAdminRole(@PathVariable UUID userId) {
+        UserResponseDto response = authService.grantAdminRole(userId);
+        return ResponseEntity.ok(response);
     }
 
 }
