@@ -4,6 +4,8 @@ import com.springbootjwtauth.dto.request.LoginRequestDto;
 import com.springbootjwtauth.dto.request.SignupRequestDto;
 import com.springbootjwtauth.dto.response.TokenResponseDto;
 import com.springbootjwtauth.dto.response.UserResponseDto;
+import com.springbootjwtauth.exception.CustomException;
+import com.springbootjwtauth.exception.ErrorCode;
 import com.springbootjwtauth.model.Role;
 import com.springbootjwtauth.model.User;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,7 @@ public class AuthService {
 
         // 1. 중복 체크
         if (userStore.containsKey(requestDto.getUsername())) {
-            throw new IllegalArgumentException("이미 가입된 사용자입니다.");
+            throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }
 
         // 2. 암호화된 비밀번호 생성
@@ -60,7 +62,7 @@ public class AuthService {
 
         // 2. 사용자가 존재하지 않거나 비밀번호가 틀리면 에러 발생 시키기
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
 
         // 3. 로그인 성공한 경우 - 지금은 토큰 없이 임시 문자열 리턴함
