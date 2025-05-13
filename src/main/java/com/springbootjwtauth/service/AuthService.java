@@ -8,6 +8,7 @@ import com.springbootjwtauth.exception.CustomException;
 import com.springbootjwtauth.exception.ErrorCode;
 import com.springbootjwtauth.model.Role;
 import com.springbootjwtauth.model.User;
+import com.springbootjwtauth.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,12 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AuthService {
 
-    // 암호화기 주입 (config에서 Bean 등록 필요)
+    // 암호화기 주입 (config에서 Bean 등록)
     private final BCryptPasswordEncoder passwordEncoder;
-
     // 메모리 저장소 (username → User)
     private final Map<String, User> userStore = new HashMap<>();
+
+    private final JwtUtil jwtUtil;
 
     public UserResponseDto signup(SignupRequestDto requestDto) {
 
@@ -65,11 +67,10 @@ public class AuthService {
             throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
 
-        // 3. 로그인 성공한 경우 - 지금은 토큰 없이 임시 문자열 리턴함
-        // 나중에 여기서 JWT 토큰을 생성해서 반환하게 될 예정임
-        String fakeToken = "로그인_성공_임시토큰"; // ← 지금은 JWT를 아직 안 쓰니까 가짜 문자열을 넣어두기.
+        // 3. 로그인 성공한 경우 : AccessToken 생성
+        String accessToken = jwtUtil.createAccessToken(user.getId());
 
         // 4. 응답 객체에 담아서 반환
-        return new TokenResponseDto(fakeToken);
+        return new TokenResponseDto(accessToken);
     }
 }
