@@ -11,6 +11,6 @@ import java.util.Set;
 public class UserResponseDto {
 
     private String username;
-    private String password;
+    private String nickname;
     private Set<Role> roles;
 }
