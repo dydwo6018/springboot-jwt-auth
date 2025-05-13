@@ -2,6 +2,7 @@ package com.springbootjwtauth.config;
 
 import com.springbootjwtauth.filter.JwtAuthenticationFilter;
 import com.springbootjwtauth.service.AuthService;
+import com.springbootjwtauth.store.UserStore;
 import com.springbootjwtauth.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
-    private final AuthService authService;
+    private final UserStore userStore;
+
     // 비밀번호 암호화를 위한 Bean 등록
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -37,7 +39,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated() // 그 외 요청은 인증 필요
                 )
                 // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 앞에 등록
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, authService.getUserStore()), UsernamePasswordAuthenticationFilter.class) // JWT 필터 등록
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userStore.getAll()), UsernamePasswordAuthenticationFilter.class) // JWT 필터 등록
                 .build();
     }
 
