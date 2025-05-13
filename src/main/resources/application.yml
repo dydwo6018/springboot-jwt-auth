@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: springboot-jwt-auth
+
+jwt:
+  secret: my-very-secret-key-that-is-very-long-32chars
