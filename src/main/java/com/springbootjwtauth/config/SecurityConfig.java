@@ -1,7 +1,7 @@
 package com.springbootjwtauth.config;
 
 import com.springbootjwtauth.filter.JwtAuthenticationFilter;
-import com.springbootjwtauth.service.AuthService;
+import com.springbootjwtauth.handler.CustomAccessDeniedHandler;
 import com.springbootjwtauth.store.UserStore;
 import com.springbootjwtauth.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +21,7 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserStore userStore;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     // 비밀번호 암호화를 위한 Bean 등록
     @Bean
@@ -36,10 +37,14 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 안함
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/signup", "/login").permitAll() // 로그인/회원가입은 인증 없이 허용
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // 그 외 요청은 인증 필요
                 )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                )
                 // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 앞에 등록
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userStore.getAll()), UsernamePasswordAuthenticationFilter.class) // JWT 필터 등록
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userStore), UsernamePasswordAuthenticationFilter.class) // JWT 필터 등록
                 .build();
     }
 
