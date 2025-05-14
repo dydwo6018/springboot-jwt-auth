@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Service
@@ -67,23 +69,18 @@ public class AuthService {
         }
 
         // 3. 로그인 성공한 경우 : AccessToken 생성
-        String accessToken = jwtUtil.createAccessToken(user.getId());
+        String accessToken = jwtUtil.createAccessToken(user);
 
         // 4. 응답 객체에 담아서 반환
         return new TokenResponseDto(accessToken);
     }
 
-    public UserResponseDto grantAdminRole(UUID userId) {
-        // 1. userId로 사용자 조회
-        User user = userStore.getAll().values().stream()
-                .filter(u -> u.getId().equals(userId))
-                .findFirst()
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public UserResponseDto grantAdminRole(String username) {
+        User user = userStore.findByUsername(username);
+        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
-        // 2. ADMIN 권한 추가 (중복 허용 안함)
-        user.getRoles().add(Role.ADMIN);
+        user.getRoles().add(Role.ADMIN); // 기존 권한에 ADMIN 추가
 
-        // 3. 응답 DTO로 변환
         return new UserResponseDto(user.getUsername(), user.getNickname(), user.getRoles());
     }
 
