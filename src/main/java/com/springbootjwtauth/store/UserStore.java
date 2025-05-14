@@ -22,8 +22,4 @@ public class UserStore {
     public User findByUsername(String username) {
         return store.get(username);
     }
-
-    public Map<String, User> getAll() {
-        return store;
-    }
 }
