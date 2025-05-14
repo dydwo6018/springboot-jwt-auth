@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Getter
 @Service
@@ -39,19 +38,23 @@ public class AuthService {
         // 2. 암호화된 비밀번호 생성
         String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
-        // 3. User 객체 생성
+        // 3. 역할 변환 로직 (null일 경우 USER 기본값)
+        Set<Role> assignedRoles = (requestDto.getRoles() == null || requestDto.getRoles().isEmpty())
+                ? Set.of(Role.USER)
+                : requestDto.getRoles();
+
+        // 4. User 객체 생성
         User user = User.builder()
-                .id(UUID.randomUUID())
                 .username(requestDto.getUsername())
                 .password(encodedPassword)
                 .nickname(requestDto.getNickname())
-                .roles(new HashSet<>(Set.of(Role.USER))) // 기본 USER 권한
+                .roles(new HashSet<>(assignedRoles))
                 .build();
 
-        // 4. 저장소에 저장
+        // 5. 저장소에 저장
         userStore.save(user);
 
-        // 5. 응답 객체 생성 및 반환
+        // 6. 응답 객체 생성 및 반환
         return new UserResponseDto(
                 user.getUsername(),
                 user.getNickname(),
